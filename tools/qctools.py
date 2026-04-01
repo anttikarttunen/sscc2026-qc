@@ -76,7 +76,71 @@ def load_xyz_as_traj(xyztraj, silent = False):
             print_error(f"Failed to load trajectory file {trajfile}")
     else:
         return traj
-            
+
+def save_xyz(atoms, xyzfile, silent = False):
+    """Saves XYZ file
+    atoms: ase.Atoms
+    xyzfile: file name or path as string
+    silent: no printing
+    
+    no return value
+    """
+    from ase.io import write    
+    try:
+        write(xyzfile, images = atoms, format = 'xyz')
+        if not silent:
+            print_info(f"Molecule was saved to file {xyzfile}\n")
+    except OSError:
+        if not silent:
+            print_error(f"Failed to save file {xyzfile}")
+
+def load_molecule_pubchem(name=None, cid=None, xyzfile=None):
+    # Returns: ase.Atoms, None if fails
+    # if xyztiedosto <> '', creates also an xyz-file
+    
+    from ase.data.pubchem import pubchem_atoms_search
+    # Catch UserWarning about conformers
+    import warnings    
+
+    if name is not None and cid is not None:        
+        print_error("Only give name or cid, not both.")
+        return None
+    elif name is None and cid is None:
+        print_error("Give name or cid.")
+        return None
+    elif name is not None:
+        usename = True
+        id = name
+    else:
+        usename = False
+        id = cid
+        
+    atoms = None
+    print_info(f"Loading molecule {id} from PubChem...")
+    try:
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter('always')
+            if usename:
+                atoms = pubchem_atoms_search(name=name)                
+            else:
+                atoms = pubchem_atoms_search(cid=cid)  
+            if len(w) > 0:
+                print("ATTENTION: Molecule has several conformers, PubChem returned the first of them.")
+    except:
+        print_error("Molekyylin lataaminen epäonnistui, tarkista nimi tai cid osoitteesta https://pubchem.ncbi.nlm.nih.gov/")       
+    
+    if atoms is not None:
+        print_info(f"Molecule {id} was loaded from PubChem.\n"
+                   f"Atoms: {len(atoms)}\n"
+                   f"Formula: {str(atoms.symbols)}")
+        atoms.info['id'] = str(id)
+        if xyzfile is not None:
+            from ase.io import write
+            write(filename = xyzfile, images = atoms, format = 'xyz')
+            print_info(f"Molecular structure was saved in file {xyzfile}")
+          
+    return atoms
+    
 ############## Functions for visualizing molecules with nglview
 
 def show_molecule(molecule, size = (500, 400), style = 'ball+stick', unitcell = None, labels = None, bg = 'black'):
