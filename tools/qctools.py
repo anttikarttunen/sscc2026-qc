@@ -96,7 +96,7 @@ def save_xyz(atoms, xyzfile, silent = False):
 
 def load_molecule_pubchem(name=None, cid=None, xyzfile=None):
     # Returns: ase.Atoms, None if fails
-    # if xyztiedosto <> '', creates also an xyz-file
+    # if xyzfile is not None, creates also an xyz-file
     
     from ase.data.pubchem import pubchem_atoms_search
     # Catch UserWarning about conformers
@@ -127,7 +127,7 @@ def load_molecule_pubchem(name=None, cid=None, xyzfile=None):
             if len(w) > 0:
                 print("ATTENTION: Molecule has several conformers, PubChem returned the first of them.")
     except:
-        print_error("Molekyylin lataaminen epäonnistui, tarkista nimi tai cid osoitteesta https://pubchem.ncbi.nlm.nih.gov/")       
+        print_error("Loading the molecule failed, check the name or cid from https://pubchem.ncbi.nlm.nih.gov/")       
     
     if atoms is not None:
         print_info(f"Molecule {id} was loaded from PubChem.\n"
