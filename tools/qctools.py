@@ -143,7 +143,7 @@ def load_molecule_pubchem(name=None, cid=None, xyzfile=None):
     
 ############## Functions for visualizing molecules with nglview
 
-def show_molecule(molecule, size = (500, 400), style = 'ball+stick', unitcell = None, labels = None, bg = 'black'):
+def show_molecule(molecule, size = (500, 400), style = 'ball+stick', unitcell = None, labels = None, bg = 'black', gui = False):
     """ Shows a molecule using NGLWidget
     molecule: ase.Atoms or ase.io.Trajectory
     size: tuple of two integers (x_pixels, y_pixels)
@@ -151,6 +151,7 @@ def show_molecule(molecule, size = (500, 400), style = 'ball+stick', unitcell = 
     unitcell: None or 'white', 'orange', 'red', ...
     labels: None or 'atomname', 'atomindex, 'element'
     bg: 'black', 'white', ...
+    gui: set to True to show GUI
     Returns: NGLWidget
     """
     import nglview
@@ -184,6 +185,6 @@ def show_molecule(molecule, size = (500, 400), style = 'ball+stick', unitcell = 
         
     nv.parameters = dict(backgroundColor = bg, clipDist = -100)
     nv.camera = 'orthographic'
-    nv.display()
+    nv.display(gui = gui)
     return nv  
 
