@@ -140,6 +140,45 @@ def load_molecule_pubchem(name=None, cid=None, xyzfile=None):
             print_info(f"Molecular structure was saved in file {xyzfile}")
           
     return atoms
+
+def load_conformers_pubchem(name=None, cid=None, xyzfile=None):
+    # retrieves all conformers for a molecule in PubChem
+    # Returns: list of ase.Atoms, None if fails
+    # if xyzfile is not None, creates also an xyz-file with all conformers
+    
+    from ase.data.pubchem import pubchem_atoms_conformer_search
+
+    if name is not None and cid is not None:        
+        print_error("Only give name or cid, not both.")
+        return None
+    elif name is None and cid is None:
+        print_error("Give name or cid.")
+        return None
+    elif name is not None:
+        usename = True
+        id = name
+    else:
+        usename = False
+        id = cid
+        
+    conformers = None
+    print_info(f"Loading all conformers for molecule {id} from PubChem...")
+    # If the search fails, ASE will raise exception with a proper message
+    if usename:
+        conformers = pubchem_atoms_conformer_search(name=name)                
+    else:
+        conformers = pubchem_atoms_conformer_search(cid=cid)  
+    
+    if conformers is not None:
+        print_info(f"Conformers for molecule {id} were loaded from PubChem.\n"
+                   f"Conformers: {len(conformers)}")
+
+        if xyzfile is not None:
+            from ase.io import write
+            write(filename = xyzfile, images = conformers, format = 'xyz')
+            print_info(f"Conformers were saved in file {xyzfile}")
+          
+    return conformers
     
 ############## Functions for visualizing molecules with nglview
 
